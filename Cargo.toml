@@ -5,5 +5,5 @@ authors = ["Ole Martin Ruud <barskern@outlook.com>"]
 edition = "2018"
 
 [dependencies]
-bootloader = "0.6.1"
-x86_64 = "0.7.1"
+bootloader = "0.9.0"
+x86_64 = "0.10.0"
