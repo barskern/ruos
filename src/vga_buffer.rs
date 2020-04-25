@@ -5,7 +5,7 @@ const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
 
 lazy_static::lazy_static! {
-    pub static ref WRITER: Spinlock<Writer> = Spinlock::new(Writer {
+    pub static ref WRITER: Spinlock<Writer<'static>> = Spinlock::new(Writer {
         current_column: 0,
         color_code: ColorCode::new(Color::Green, Color::Black),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
@@ -29,13 +29,13 @@ pub fn _print(args: core::fmt::Arguments) {
     WRITER.lock().write_fmt(args).unwrap();
 }
 
-pub struct Writer {
+pub struct Writer<'b> {
     current_column: usize,
     color_code: ColorCode,
-    buffer: &'static mut Buffer,
+    buffer: &'b mut Buffer,
 }
 
-impl Writer {
+impl Writer<'_> {
     fn write_byte(&mut self, b: u8) {
         match b {
             b'\n' => self.write_newline(),
@@ -80,7 +80,7 @@ impl Writer {
     }
 }
 
-impl core::fmt::Write for Writer {
+impl core::fmt::Write for Writer<'_> {
     fn write_str(&mut self, s: &str) -> core::result::Result<(), core::fmt::Error> {
         for b in s.bytes() {
             match b {
